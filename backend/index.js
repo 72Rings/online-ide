@@ -13,10 +13,11 @@ app.use(bodyParser.json());
 
 // Middleware for CORS
 const allowedOrigins = [
-  'http://localhost:3000', // For local development
-  'https://main.d1z5int3i8zeva.amplifyapp.com', // Amplify app URL
-  'https://amplify-ide-backend-test-75f90377a095.herokuapp.com' // Heroku URL
+    'http://localhost:3000',
+    'https://your-amplify-domain.com', // Update with your Amplify domain
+    'https://amplify-ide-backend-test-422d9d6bb2a8.herokuapp.com'
 ];
+
 
 app.use(
   cors({
