@@ -11,11 +11,11 @@ const app = express();
 // Middleware
 app.use(bodyParser.json());
 
-// Configure CORS
+// Middleware for CORS
 const allowedOrigins = [
-  'http://localhost:3000',
-  'https://your-frontend-domain.com', // Replace with your actual frontend domain
-  'https://amplify-ide-backend-test-75f90377a095.herokuapp.com'
+  'http://localhost:3000', // For local development
+  'https://main.d1z5int3i8zeva.amplifyapp.com', // Amplify app URL
+  'https://amplify-ide-backend-test-75f90377a095.herokuapp.com' // Heroku URL
 ];
 
 app.use(
@@ -29,9 +29,9 @@ app.use(
     },
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true, // If you need to handle cookies or authentication
   })
 );
+
 
 // Helper Function to Write Code to File
 const writeCodeToFile = (filename, content) => {
