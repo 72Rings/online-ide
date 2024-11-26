@@ -14,7 +14,7 @@ const App = () => {
   const [language, setLanguage] = useState('javascript');
   const [output, setOutput] = useState('');
 
-  const API_URL = "https://amplify-ide-backend-test-75f90377a095.herokuapp.com/run"; // Heroku backend URL
+  const API_URL = "https://amplify-ide-backend-test-422d9d6bb2a8.herokuapp.com/run";
 
   const handleThemeChange = (event) => setTheme(event.target.value);
   const handleLanguageChange = (event) => setLanguage(event.target.value);
