@@ -1,0 +1,11 @@
+node_modules
+*.log
+*.env
+*.zip
+.git
+dist
+coverage
+.vscode
+.idea
+amplify
+frontend

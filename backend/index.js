@@ -1,4 +1,4 @@
-const express = require('express'); 
+const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const { exec } = require('child_process');
@@ -9,8 +9,29 @@ const path = require('path');
 const app = express();
 
 // Middleware
-app.use(cors());
 app.use(bodyParser.json());
+
+// Configure CORS
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://your-frontend-domain.com', // Replace with your actual frontend domain
+  'https://amplify-ide-backend-test-75f90377a095.herokuapp.com'
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true, // If you need to handle cookies or authentication
+  })
+);
 
 // Helper Function to Write Code to File
 const writeCodeToFile = (filename, content) => {
@@ -56,5 +77,5 @@ app.post('/run', (req, res) => {
 });
 
 // Start Server
-const PORT = 5000;
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+const PORT = process.env.PORT || 5000; // Use Heroku's dynamic port
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
