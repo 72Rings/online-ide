@@ -11,27 +11,16 @@ const app = express();
 // Middleware
 app.use(bodyParser.json());
 
-// Middleware for CORS
 const allowedOrigins = [
-  'http://localhost:3000', // For local development
-  'https://main.d1z5int3i8zeva.amplifyapp.com', // Amplify app URL
-  'https://amplify-ide-backend-test-75f90377a095.herokuapp.com' // Heroku URL
+  'https://your-amplify-domain.com', // Update with your Amplify domain
+  'https://amplify-ide-backend-test-422d9d6bb2a8.herokuapp.com'
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
-
+app.use(cors({
+  origin: '*', // Temporarily allow all origins
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 // Helper Function to Write Code to File
 const writeCodeToFile = (filename, content) => {
@@ -40,39 +29,51 @@ const writeCodeToFile = (filename, content) => {
   return filePath;
 };
 
-// Endpoint to Run Code
 app.post('/run', (req, res) => {
   const { language, code } = req.body;
-  let command;
 
-  // Command Switch for Different Languages
+  // Validate request body
+  if (!code || !language) {
+    return res.status(400).json({ output: 'Error: Missing code or language.' });
+  }
+
+  if (!code.trim()) {
+    return res.status(400).json({ output: 'Error: Code is empty.' });
+  }
+
+  let command;
   try {
     switch (language.toLowerCase()) {
-      case 'c++':
-        writeCodeToFile('temp.cpp', code);
-        command = `g++ temp.cpp -o temp && ./temp`;
-        break;
-      case 'java':
-        writeCodeToFile('Main.java', code);
-        command = `javac Main.java && java Main`;
+      case 'javascript':
+        command = `node -e "${code.replace(/"/g, '\\"')}"`;
         break;
       case 'python':
         command = `python3 -c "${code.replace(/"/g, '\\"')}"`;
         break;
+      case 'java':
+        fs.writeFileSync('Main.java', code);
+        command = `javac Main.java && java Main`;
+        break;
+      case 'cpp':
+        fs.writeFileSync('temp.cpp', code);
+        command = `g++ temp.cpp -o temp && ./temp`;
+        break;
       default:
-        return res.status(400).json({ output: 'Invalid language' });
+        return res.status(400).json({ output: 'Error: Unsupported language selected.' });
     }
 
-    // Execute Command
     exec(command, (error, stdout, stderr) => {
       if (error) {
-        res.json({ output: stderr || error.message });
+        console.error(`Error executing command: ${error.message}`);
+        console.error(`Stderr: ${stderr}`);
+        res.status(400).json({ output: stderr || error.message });
       } else {
         res.json({ output: stdout });
       }
     });
   } catch (err) {
-    res.status(500).json({ output: 'Server error' });
+    console.error(`Server error: ${err.message}`);
+    res.status(500).json({ output: 'Server error.' });
   }
 });
 
